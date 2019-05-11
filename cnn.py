@@ -68,19 +68,19 @@ def load_img_from_folder(folder_path):
             all_images.append(img)
     return all_images,images_info
 
-def read_all_path_from_folder(folder_path):
+def convert_name_to_path(folder_path,images_info):
     images_path = []
-    for img in os.listdir(folder_path):
-        if img.split('.')[1] == 'jpg':
-            path = folder_path + '/' + img
-            images_path.append(path)
+    for img in images_info:
+        path = folder_path + '/' + img['name'] + '.jpg'
+        images_path.append(path)
+    # print(images_path)
     return images_path
 
 def compute_neighbor(vector_t,vector_c,k):
     """
     Return the index of k nearest neighbors of vector_t in order
     """
-    print("---- COMPUTE K NEAREST NEIGHBORHOOD ----")
+    # print("---- COMPUTE K NEAREST NEIGHBORHOOD ----")
     euclidean_distance = []
     cosine_distance = []
     for vec in vector_c:
@@ -88,11 +88,6 @@ def compute_neighbor(vector_t,vector_c,k):
         cdis = spatial.distance.cosine(vector_t, vec)
         euclidean_distance.append(dis)
         cosine_distance.append(cdis)
-
-    # print("ALL EUCLIDEAN DISTANCES: ")
-    # print(euclidean_distance)
-    # print("ALL COSINE DISTANCES: ")
-    # print(cosine_distance)
 
     dis_array = np.array(euclidean_distance)
     # idx_l2 = np.argpartition(dis_array, k)
@@ -102,8 +97,9 @@ def compute_neighbor(vector_t,vector_c,k):
     idx_cosine = np.argsort(cdis_array)[:k]
     return idx_l2, idx_cosine
 
-def model_predict_method(model,tar,cand,k):
+def model_predict_method(tar,cand,k):
     print("---- EXTRACT FEATURE VECTORS FROM IMAGES ----")
+    model = load_model()
     vector_c = []
     for img in cand:
         vector = model.predict(np.expand_dims(img, axis=0))
